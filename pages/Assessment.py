@@ -72,7 +72,7 @@ def add_parameters_csv(clf_name):
         p["max_depth"] = 10  # Default value
         p["n_estimators"] = 100  # Default value
     else:
-        st.write("No Parameters selection")
+        st.write(" ")
     return p
 
 p = add_parameters_csv(classifiers)
@@ -94,9 +94,14 @@ clf = get_Classifier_csv(classifiers,p)
 X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=1200)
 clf.fit(X_train,y_train)
 y_pred_test = clf.predict(X_test)
-#st.write(f"classifier Used={classifiers}")
+
+st.write(f"Classifier Used={classifiers}")
+
+
 acc = accuracy_score(y_test,y_pred_test)
-#st.write(f"accuracy score={acc}")
+st.write(f"Accuracy Score={acc}")
+
+
 st.write("1. Enter your age ")
 age = st.number_input("Age",0,100)
 st.write("2. Enter your gender ")
