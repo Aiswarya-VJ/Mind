@@ -126,7 +126,11 @@ data1={'Age':age, 'Gender':Gender, 'self_employed':self_employed, 'family_histor
 df2 = pd.DataFrame(data1,index=["Name"])
 y_pred_test1 = clf.predict(df2)
 if(y_pred_test1==0):
-    st.write("YOU MAY BETTER GO FOR A TREATMENT.")
+    
+    st.markdown(
+    "<span style='color:red; font-size:24px; font-weight:bold;'>YOU DO NEED BETTER TREATMENT NOW. </span>", 
+    unsafe_allow_html=True
+)
      # Adding graphical representation
     labels = ['Need Treatment', 'No Treatment']
     sizes = [1, 0]  # If user needs treatment
@@ -139,7 +143,8 @@ if(y_pred_test1==0):
 else:
     st.markdown(
     "<span style='color:green; font-size:24px; font-weight:bold;'>YOU DO NOT NEED ANY TREATMENT NOW. 😄</span>", 
-    unsafe_allow_html=True)
+    unsafe_allow_html=True
+)
     labels = ['Need Treatment', 'No Treatment']
     sizes = [0, 1]  # If user does not need treatment
 
