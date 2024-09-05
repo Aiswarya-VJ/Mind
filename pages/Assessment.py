@@ -149,7 +149,6 @@ else:
    
 # Calculate accuracy
 acc = accuracy_score(y_test, y_pred_test)
-st.write(f"Classifier Used: {classifiers}")
 st.write(f"Accuracy Score: {acc:.2%}")
 
 # Visualizing the results using Seaborn
