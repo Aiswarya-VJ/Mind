@@ -11,7 +11,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder  # Importing LabelEncoder
 
 st.title("Let's Get Predict Your Mind  ")
-st.write(f"Classifier Used: {classifiers}")
 # Classifier selection from sidebar
 classifiers = st.sidebar.selectbox("Used Classifier", ("SVC", "Random Forest", "NaiveBayes"))
 
@@ -150,6 +149,7 @@ else:
    
 # Calculate accuracy
 acc = accuracy_score(y_test, y_pred_test)
+st.write(f"Classifier Used: {classifiers}")
 st.write(f"Accuracy Score: {acc:.2%}")
 
 # Visualizing the results using Seaborn
