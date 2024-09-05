@@ -137,7 +137,9 @@ if(y_pred_test1==0):
     st.video("https://www.youtube.com/watch?v=-GXfLY4-d8w")
    
 else:
-    st.markdown("**<span style='color:green'>YOU DO NOT NEED ANY TREATMENT NOW. 😄</span>**", unsafe_allow_html=True)
+    st.markdown(
+    "<span style='color:green; font-size:24px; font-weight:bold;'>YOU DO NOT NEED ANY TREATMENT NOW. 😄</span>", 
+    unsafe_allow_html=True)
     labels = ['Need Treatment', 'No Treatment']
     sizes = [0, 1]  # If user does not need treatment
 
