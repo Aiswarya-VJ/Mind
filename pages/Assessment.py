@@ -128,7 +128,7 @@ y_pred_test1 = clf.predict(df2)
 if(y_pred_test1==0):
     
     st.markdown(
-    "<span style='color:red; font-size:24px; font-weight:bold;'>YOU DO NEED BETTER TREATMENT NOW. </span>", 
+    "<span style='color:red; font-size:24px; font-weight:bold;'>YOU DO NEED BETTER TREATMENT NOW. 😔</span>", 
     unsafe_allow_html=True
 )
      # Adding graphical representation
