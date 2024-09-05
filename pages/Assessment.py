@@ -1,105 +1,54 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import streamlit as st
-import streamlit.components.v1 as components 
-from sklearn.preprocessing import LabelEncoder
-from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import r2_score, mean_squared_error
-from PIL import Image
-
+from sklearn.preprocessing import LabelEncoder  # Importing LabelEncoder
 
 st.title("Let's Get Predict Your Mind  ")
-#image = Image.open('medicine.png')
-#st.image(image, caption='Just Relax.....Let's Get Alright ')
+# Classifier selection from sidebar
+classifiers = st.sidebar.selectbox("Used Classifier", ("SVC", "Random Forest", "NaiveBayes"))
 
-
-classifiers = st.sidebar.selectbox("Used Classifier",("SVC","Random Forest","NaiveBayes"))
-#st.write(classifiers)
-st.write("Refer the following and fill your data")
+# Load the dataset
 data = pd.read_csv("survey.csv")
-data.drop(columns=['Timestamp', 'Country', 'state', 'comments'], inplace = True)
-data.drop(data[data['Age'] < 0].index, inplace = True) 
-data.drop(data[data['Age'] > 100].index, inplace = True)
-data['dailylife_interfere'] = data['dailylife_interfere'].fillna('Don\'t know' )
+data.drop(columns=['Timestamp', 'Country', 'state', 'comments'], inplace=True)
+data['dailylife_interfere'] = data['dailylife_interfere'].fillna("Don't know")
 data['self_employed'] = data['self_employed'].fillna('No')
-data['Gender'].replace(['Male ', 'male', 'M', 'm', 'Male', 'Cis Male',
-                     'Man', 'cis male', 'Mail', 'Male-ish', 'Male (CIS)',
-                      'Cis Man', 'msle', 'Malr', 'Mal', 'maile', 'Make',], 'Male', inplace = True)
 
-data['Gender'].replace(['Female ', 'female', 'F', 'f', 'Woman', 'Female',
-                     'femail', 'Cis Female', 'cis-female/femme', 'Femake', 'Female (cis)',
-                     'woman',], 'Female', inplace = True)
-
-data["Gender"].replace(['Female (trans)', 'queer/she/they', 'non-binary',
-                     'fluid', 'queer', 'Androgyne', 'Trans-female', 'male leaning androgynous',
-                      'Agender', 'A little about you', 'Nah', 'All',
-                      'ostensibly male, unsure what that really means',
-                      'Genderqueer', 'Enby', 'p', 'Neuter', 'something kinda male?',
-                      'Guy (-ish) ^_^', 'Trans woman',], 'Other', inplace = True)
-list_col=['Age', 'Gender', 'self_employed', 'family_history', 'treatment',
-       'dailylife_interfere', 'no_employees', 'remote_work', 'tech_company',
-       'benefits', 'care_options', 'wellness_program', 'seek_help',
-       'anonymity', 'leave', 'mental_health_consequence',
-       'phys_health_consequence', 'coworkers', 'supervisor',
-       'mental_health_interview', 'phys_health_interview',
-       'mental_vs_physical', 'obs_consequence']
-
-n_f = data.select_dtypes(include=[np.number]).columns
-c_f = data.select_dtypes(include=[object]).columns
-
+# Preprocess the data (clean, encode, etc.)
 label_encoder = LabelEncoder()
-for col in c_f:
-    label_encoder.fit(data[col])
-    data[col] = label_encoder.transform(data[col])   
-st.write(data.head(2))
-X = data.drop("treatment",axis=1)
+for col in data.select_dtypes(include=[object]).columns:
+    data[col] = label_encoder.fit_transform(data[col])
+
+# Define the features and the target
+X = data.drop("treatment", axis=1)
 y = data["treatment"]
 
-def add_parameters_csv(clf_name):
-    p = dict()
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1200)
+
+# Function to get classifier
+def get_classifier(clf_name):
     if clf_name == "SVC":
-        # Set default value for C
-        p["C"] = 1.0  # Default value
+        return SVC(C=1.0)
     elif clf_name == "Random Forest":
-        # Set default values for max_depth and n_estimators
-        p["max_depth"] = 10  # Default value
-        p["n_estimators"] = 100  # Default value
-    else:
-        st.write(" ")
-    return p
-
-p = add_parameters_csv(classifiers)
-
-
-def get_Classifier_csv(clf_name,p):
-    if clf_name == "SVC":
-        clf = SVC(C=p["C"])
-    elif clf_name == "Random Forest":
-        clf = RandomForestClassifier(n_estimators=p["n_estimators"],max_depth=p["max_depth"],random_state=1200)
-  
+        return RandomForestClassifier(n_estimators=100, max_depth=10, random_state=1200)
     elif clf_name == "NaiveBayes":
-        clf = GaussianNB()
-    else:
-        clf = DecisionTreeClassifier(min_samples_split=p["min_samples_split"])
-    return clf
-clf = get_Classifier_csv(classifiers,p)
+        return GaussianNB()
 
-X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=1200)
-clf.fit(X_train,y_train)
+# Get the selected classifier
+clf = get_classifier(classifiers)
+
+# Train and predict
+clf.fit(X_train, y_train)
 y_pred_test = clf.predict(X_test)
 
-st.write(f"Classifier Used={classifiers}")
-
-
-acc = accuracy_score(y_test,y_pred_test)
-st.write(f"Accuracy Score={acc}")
+# User input fields (rest of your code here)
 
 
 st.write("1. Enter your age ")
@@ -178,22 +127,49 @@ df2 = pd.DataFrame(data1,index=["Name"])
 y_pred_test1 = clf.predict(df2)
 if(y_pred_test1==0):
     st.write("YOU MAY BETTER GO FOR A TREATMENT.")
+     # Adding graphical representation
+    labels = ['Need Treatment', 'No Treatment']
+    sizes = [1, 0]  # If user needs treatment
     st.video("https://www.youtube.com/watch?v=IC9DM7w-pm8")
     st.video("https://www.youtube.com/watch?v=AUom_FsLTMo")
     st.write("Some inspiration videos:")
     st.video("https://www.mayoclinic.org/diseases-conditions/mental-illness/diagnosis-treatment/drc-20374974")
     st.video("https://www.youtube.com/watch?v=-GXfLY4-d8w")
+   
 else:
     st.write("YOU DO NOT NEED ANY TREATMENT NOW. :smile:")
+    labels = ['Need Treatment', 'No Treatment']
+    sizes = [0, 1]  # If user does not need treatment
+
     st.write("Just relax , watch the mentioned videos.....Also go through the exercices and tips provided. ")
     st.write("Some inspirational videos are:")
-    
     st.video("https://www.youtube.com/watch?v=-GXfLY4-d8w")
 
-    hide_streamlit_style = """
+    
+   
+# Calculate accuracy
+acc = accuracy_score(y_test, y_pred_test)
+st.write(f"Classifier Used: {classifiers}")
+st.write(f"Accuracy Score: {acc:.2%}")
+
+# Visualizing the results using Seaborn
+fig, ax = plt.subplots()
+
+# Create a confusion matrix or accuracy bar chart
+sns.barplot(x=[classifiers], y=[acc * 100], ax=ax)
+ax.set_title("Classifier Accuracy")
+ax.set_ylabel("Accuracy (%)")
+ax.set_ylim(0, 100)
+
+# Display the graph
+st.pyplot(fig)
+
+
+
+hide_streamlit_style = """
             <style>
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             </style>
             """
-    st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
